@@ -3,10 +3,15 @@
 MainController::MainController(QObject *parent)
     : QObject{parent}
 {
-	m_geometryModel = std::make_unique<PolydotGeometryModel>();
+	m_geometryModel = std::make_unique<LinesMeshModel>();
 }
 
-PolydotGeometryModel *MainController::geometryModel() const
+LinesMeshModel *MainController::geometryModel() const
 {
 	return m_geometryModel.get();
+}
+
+QVector3D MainController::globalScale() const
+{
+	return m_globalScale;
 }

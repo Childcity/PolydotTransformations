@@ -2,19 +2,19 @@
 
 #include <QAbstractListModel>
 
-#include <GeometryPrimitives.h>
+#include <models/GeometryPrimitives.h>
 
-class PolydotGeometryModel : public QAbstractListModel
+class LinesMeshModel : public QAbstractListModel
 {
 	Q_OBJECT
 
 public:
-	enum PolydotGeometryRoles
+	enum LinesMeshRoles
 	{
 		LineGeometryRole = Qt::UserRole + 1,
 	};
 
-	explicit PolydotGeometryModel(QObject *parent = nullptr);
+	explicit LinesMeshModel(QObject *parent = nullptr);
 
 	QHash<int, QByteArray> roleNames() const override;
 	int rowCount(const QModelIndex &parent) const override;

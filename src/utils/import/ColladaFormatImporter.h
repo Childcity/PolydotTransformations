@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GeometryPrimitives.h>
+#include <models/GeometryPrimitives.h>
 
 struct QXmlStreamReader;
 struct Line;

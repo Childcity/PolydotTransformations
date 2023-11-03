@@ -176,8 +176,9 @@ ApplicationWindow {
 				}
 			}
 
-			PolydotObject {
-				model: controller.geometryModel
+			MeshList {
+				//model: controller.
+				scale: controller.globalScale
 			}
 		}
 

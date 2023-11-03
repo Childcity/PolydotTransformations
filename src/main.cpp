@@ -1,9 +1,9 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
-#include <GeometryPrimitives.h>
-#include <MainController.h>
-#include <MathUtils.h>
+#include <controllers/MainController.h>
+#include <models/GeometryPrimitives.h>
+#include <utils/MathUtils.h>
 
 #define REG_SINGLETON(type)                                                                        \
 	qmlRegisterSingletonType<type>(#type, 1, 0, #type, &type::CreateInstance)

@@ -1,8 +1,8 @@
-#include "PolydotGeometryModel.h"
+#include "LinesMeshModel.h"
 
-#include <ColladaFormatImporter.h>
+#include <utils/import/ColladaFormatImporter.h>
 
-PolydotGeometryModel::PolydotGeometryModel(QObject *parent)
+LinesMeshModel::LinesMeshModel(QObject *parent)
     : QAbstractListModel(parent)
 {
 	const auto path = "C:\\Users\\Ariel\\Documents\\AAScetch\\exp\\Untitled.dae";
@@ -16,14 +16,14 @@ PolydotGeometryModel::PolydotGeometryModel(QObject *parent)
 	}
 }
 
-QHash<int, QByteArray> PolydotGeometryModel::roleNames() const
+QHash<int, QByteArray> LinesMeshModel::roleNames() const
 {
 	return {
 	    {LineGeometryRole, "lineGeometry"},
 	};
 }
 
-int PolydotGeometryModel::rowCount(const QModelIndex &parent) const
+int LinesMeshModel::rowCount(const QModelIndex &parent) const
 {
 	if (parent.isValid()) {
 		return 0;
@@ -32,7 +32,7 @@ int PolydotGeometryModel::rowCount(const QModelIndex &parent) const
 	return static_cast<int>(m_geometry.size());
 }
 
-QVariant PolydotGeometryModel::data(const QModelIndex &index, int role) const
+QVariant LinesMeshModel::data(const QModelIndex &index, int role) const
 {
 	if (!index.isValid()) {
 		return {};

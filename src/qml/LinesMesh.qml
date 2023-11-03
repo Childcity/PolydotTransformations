@@ -1,20 +1,20 @@
-import QtQml
 import QtQuick
 import QtQuick3D
 
 Node {
 	id: root
 
-	property QtObject model: null
+	property alias model: mesh.model
 
 	Repeater3D {
-		model: root.model
+		id: mesh
 
 		Loader3D {
 			required property QtObject lineGeometry
 
+			asynchronous: true
+
 			Model {
-				scale: internal.scale
 				geometry: lineGeometry
 				materials: [
 					DefaultMaterial {
@@ -26,12 +26,5 @@ Node {
 				]
 			}
 		}
-	}
-
-
-	QtObject {
-		id: internal
-
-		readonly property vector3d scale: Qt.vector3d(100, 100, 100)
 	}
 }

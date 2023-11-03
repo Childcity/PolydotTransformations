@@ -1,12 +1,13 @@
 #include "MathUtils.h"
 
+#include <ranges>
+
+#include <QLoggingCategory>
 #include <QQmlEngine>
 
-#include <GaussJordanElimination.h>
-#include <GeometryPrimitives.h>
-#include <QLoggingCategory>
+#include <models/GeometryPrimitives.h>
 
-#include <ranges>
+#include "GaussJordanElimination.h"
 
 namespace {
 
