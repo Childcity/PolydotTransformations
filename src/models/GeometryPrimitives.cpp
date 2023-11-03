@@ -207,13 +207,13 @@ void PointGeometry::updateData()
 	update();
 }
 
-StreightLine StreightLine::FromPoints(QVector3D p1, QVector3D p2)
+StreightLine StreightLine::FromLine(Line line)
 {
 	// https://math.stackexchange.com/questions/637922/how-can-i-find-coefficients-a-b-c-given-two-points
 	return {
-	    p1.y() - p2.y(),
-	    p2.x() - p1.x(),
-	    p1.x() * p2.y() - p2.x() * p1.y(),
+	    line.p1.y() - line.p2.y(),
+	    line.p2.x() - line.p1.x(),
+	    line.p1.x() * line.p2.y() - line.p2.x() * line.p1.y(),
 	};
 }
 
@@ -248,14 +248,13 @@ float StreightLine::signDistanceToPoint(QVector3D p) const
 LineGeometry::LineGeometry(StreightLine line)
 {
 	const auto [A, B, C] = std::tuple{line.A, line.B, line.C};
-	m_p1 = {0, -C / B, 0};
-	m_p2 = {1, (-A - C) / B, 0};
+	m_line.p1 = {0, -C / B, 0};
+	m_line.p2 = {1, (-A - C) / B, 0};
 	updateData();
 }
 
-LineGeometry::LineGeometry(QVector3D p1, QVector3D p2)
-    : m_p1(p1)
-    , m_p2(p2)
+LineGeometry::LineGeometry(Line line)
+    : m_line(std::move(line))
 {
 	updateData();
 }
@@ -265,13 +264,13 @@ void LineGeometry::updateData()
 	constexpr auto pointsCount = 2;
 	QByteArray vertexes(pointsCount * cPointDataSize, Qt::Uninitialized);
 
-	setPoint(vertexes, 0, m_p1);
-	setPoint(vertexes, 1, m_p2);
+	setPoint(vertexes, 0, m_line.p1);
+	setPoint(vertexes, 1, m_line.p2);
 
 	clear();
 	setVertexData(vertexes);
 	setStride(cPointDataSize);
-	setBounds(m_p1, m_p2);
+	setBounds(m_line.p1, m_line.p2);
 
 	setPrimitiveType(PrimitiveType::Lines);
 	addAttribute(Attribute::PositionSemantic, 0, Attribute::F32Type);
@@ -280,15 +279,15 @@ void LineGeometry::updateData()
 
 QVector3D LineGeometry::p1() const
 {
-	return m_p1;
+	return m_line.p1;
 }
 
 void LineGeometry::setP1(QVector3D newP1)
 {
-	if (m_p1 == newP1) {
+	if (m_line.p1 == newP1) {
 		return;
 	}
-	m_p1 = newP1;
+	m_line.p1 = newP1;
 
 	emit p1Changed();
 	updateData();
@@ -296,15 +295,15 @@ void LineGeometry::setP1(QVector3D newP1)
 
 QVector3D LineGeometry::p2() const
 {
-	return m_p2;
+	return m_line.p2;
 }
 
 void LineGeometry::setP2(QVector3D newP2)
 {
-	if (m_p2 == newP2) {
+	if (m_line.p2 == newP2) {
 		return;
 	}
-	m_p2 = newP2;
+	m_line.p2 = newP2;
 
 	emit p2Changed();
 	updateData();
@@ -312,7 +311,7 @@ void LineGeometry::setP2(QVector3D newP2)
 
 StreightLine LineGeometry::toStraightLine()
 {
-	return StreightLine::FromPoints(m_p1, m_p2);
+	return StreightLine::FromLine(m_line);
 }
 
 QDebug operator<<(QDebug dbg, const PointGeometry &geom)

@@ -53,6 +53,7 @@ qt_add_qml_module(${APP_NAME}
         ${SOURCE_DIR}/res/logo.png
     RESOURCE_PREFIX "/"
     IMPORTS
+        QtCore
         QtQuick3D
 )
 
@@ -65,6 +66,7 @@ target_compile_definitions(${APP_NAME}
   $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>
 )
 target_link_libraries(${APP_NAME} PRIVATE
+    Qt6::Core
     Qt6::Qml
     Qt6::Quick
     Qt6::Quick3D

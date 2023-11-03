@@ -64,6 +64,7 @@ class PointGeometry
 {
 	Q_OBJECT
 	QML_NAMED_ELEMENT(PointGeometry)
+	Q_DISABLE_COPY(PointGeometry)
 
 	Q_PROPERTY(QVector3D point READ point WRITE setPoint NOTIFY pointChanged FINAL)
 
@@ -78,6 +79,12 @@ signals:
 
 private:
 	void updateData();
+};
+
+struct Line
+{
+	QVector3D p1;
+	QVector3D p2;
 };
 
 struct StreightLine
@@ -95,7 +102,7 @@ struct StreightLine
 		return {*it++, *it++, *it};
 	}
 
-	static StreightLine FromPoints(QVector3D p1, QVector3D p2);
+	static StreightLine FromLine(Line line);
 
 	float length() const;
 
@@ -109,6 +116,7 @@ class LineGeometry : public QQuick3DGeometry
 {
 	Q_OBJECT
 	QML_NAMED_ELEMENT(LineGeometry)
+	Q_DISABLE_COPY(LineGeometry)
 
 	Q_PROPERTY(QVector3D p1 READ p1 WRITE setP1 NOTIFY p1Changed FINAL)
 	Q_PROPERTY(QVector3D p2 READ p2 WRITE setP2 NOTIFY p2Changed FINAL)
@@ -116,7 +124,7 @@ class LineGeometry : public QQuick3DGeometry
 public:
 	explicit LineGeometry() = default;
 	explicit LineGeometry(StreightLine line);
-	LineGeometry(QVector3D p1, QVector3D p2);
+	explicit LineGeometry(Line line);
 
 	QVector3D p1() const;
 	void setP1(QVector3D newP1);
@@ -133,8 +141,7 @@ signals:
 private:
 	void updateData();
 
-	QVector3D m_p1;
-	QVector3D m_p2;
+	Line m_line;
 };
 
 QDebug operator<<(QDebug, const PointGeometry &);

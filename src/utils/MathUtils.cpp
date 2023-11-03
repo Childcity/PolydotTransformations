@@ -4,10 +4,13 @@
 
 #include <GaussJordanElimination.h>
 #include <GeometryPrimitives.h>
+#include <QLoggingCategory>
 
 #include <ranges>
 
 namespace {
+
+Q_LOGGING_CATEGORY(polydot_line, "utils.polydot_line", QtInfoMsg);
 
 constexpr float eps = std::numeric_limits<float>().epsilon();
 
@@ -74,8 +77,8 @@ LineGeometry *MathUtils::getPolydotLine(
 	baseLineDirection.normalize();
 
 	{
-		qDebug() << "Base Normilized Line: " << baseLineNormilized;
-		qDebug().noquote() << std::format(
+		qCDebug(polydot_line) << "Base Normilized Line: " << baseLineNormilized;
+		qCDebug(polydot_line).noquote() << std::format(
 		    "\n       x - {}      y - {}     z - {} "
 		    "\nLine: -------- = -------- = -------- "
 		    "\n       {:.2}       {:.2}      {:.2}  ",
@@ -104,10 +107,10 @@ LineGeometry *MathUtils::getPolydotLine(
 		assert(qFuzzyCompare(betta, betta2));
 		assert(qFuzzyCompare(betta, betta3));
 
-		qDebug() << "Original Basis" << origBasis;
-		qDebug() << "Result   Basis" << resBasis;
-		qDebug() << "Betta" << betta << betta2 << betta3;
-		qDebug() << "-----------------------------------------";
+		qCDebug(polydot_line) << "Original Basis" << origBasis;
+		qCDebug(polydot_line) << "Result   Basis" << resBasis;
+		qCDebug(polydot_line) << "Betta" << betta << betta2 << betta3;
+		qCDebug(polydot_line) << "-----------------------------------------";
 
 		float bettaSqure = betta * betta;
 
@@ -137,12 +140,15 @@ LineGeometry *MathUtils::getPolydotLine(
 	};
 
 	try {
-		auto polidotSolution = solve::SolveSystem(polidotEquestion);
-		assert(polidotSolution.size() == 3);
-		// const StreightLine resLine = {polidotSolution[0], polidotSolution[1], polidotSolution[2]};
-		return new LineGeometry(StreightLine::FromArray(polidotSolution));
+		const auto polidotSolutionArr = solve::SolveSystem(polidotEquestion);
+		assert(polidotSolutionArr.size() == 3);
+
+		const auto resLine = StreightLine::FromArray(polidotSolutionArr);
+		qCDebug(polydot_line) << "Result line" << resLine;
+
+		return new LineGeometry(resLine);
 	} catch (const std::runtime_error &e) {
-		qWarning() << "System cannot be solved: " << e.what();
+		qCWarning(polydot_line) << "System cannot be solved: " << e.what();
 		return {};
 	}
 }

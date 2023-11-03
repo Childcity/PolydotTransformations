@@ -1,6 +1,6 @@
 #include "GaussJordanElimination.h"
 
-#include <QDebug>
+#include <QLoggingCategory>
 
 #include <sstream>
 #include <string>
@@ -9,14 +9,13 @@ namespace gauss_jordan_elimination {
 
 namespace {
 
+Q_LOGGING_CATEGORY(gauss_jordan_elimination, "utils.gauss_jordan_elimination", QtInfoMsg);
+
 using Array = std::vector<float>;
-constexpr bool cLogIsOn = false;
 
 void writeLine(std::string_view line)
 {
-	if constexpr (cLogIsOn) {
-		qDebug() << line.data();
-	}
+	qCDebug(gauss_jordan_elimination) << line.data();
 }
 
 // Reduce matrix to reduced row echelon form.

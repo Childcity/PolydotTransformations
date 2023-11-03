@@ -169,11 +169,9 @@ ApplicationWindow {
 					const resLineGeom = MathUtils.getPolydotLine(originalLine.geometry,
 										origBasises, resBasises);
 					if (!resLineGeom) {
-						console.warn("No solutions to draw Result Line!");
 						resultLine.geometry = LineGeometry;
 						return;
 					}
-					console.warn("Result Line", resLineGeom.p1, resLineGeom.p2)
 					resultLine.geometry = resLineGeom;
 				}
 			}

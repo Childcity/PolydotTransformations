@@ -1,10 +1,19 @@
 #include "PolydotGeometryModel.h"
 
+#include <ColladaFormatImporter.h>
+
 PolydotGeometryModel::PolydotGeometryModel(QObject *parent)
     : QAbstractListModel(parent)
 {
-	m_geometry.emplace_back(std::make_unique<LineGeometry>(QVector3D{7, 2, 0}, QVector3D{10, 6, 0}));
-	m_geometry.emplace_back(std::make_unique<LineGeometry>(QVector3D{7, 4, 0}, QVector3D{10, 8, 0}));
+	const auto path = "C:\\Users\\Ariel\\Documents\\AAScetch\\exp\\Untitled.dae";
+	ColladaFormatImporter importer(path);
+	importer.importGeometries();
+
+	const auto geometries = importer.getGeometries();
+
+	for (auto &geom : geometries.front()) {
+		m_geometry.emplace_back(std::make_unique<LineGeometry>(geom));
+	}
 }
 
 QHash<int, QByteArray> PolydotGeometryModel::roleNames() const
