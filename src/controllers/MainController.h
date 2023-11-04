@@ -34,4 +34,5 @@ private:
 	QVector3D m_globalScale = {100, 100, 100};
 
 	std::unique_ptr<MeshListModel> m_meshListModel;
+	MeshList m_meshes;
 };

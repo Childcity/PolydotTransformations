@@ -33,9 +33,16 @@ void MainController::loadMeshes()
 		ColladaFormatImporter importer(path);
 		importer.importGeometries();
 
-		const auto geoms = importer.getGeometries();
+		m_meshes = importer.getGeometries();
 
-		m_meshListModel = std::make_unique<MeshListModel>(geoms);
+		///////////////////////////////////////////////////
+		//		auto letterP = *(m_meshes.begin() + 7);
+		//		letterP = {letterP[2],letterP[3]};
+
+		//		m_meshes = {letterP};
+		///////////////////////////////////////////////////
+
+		m_meshListModel = std::make_unique<MeshListModel>(m_meshes);
 		emit meshListModelChanged();
 	}).detach();
 }
@@ -46,32 +53,32 @@ void MainController::applyPolydotTransformations(QVariantList origBasises, QVari
 		return;
 	}
 
-	auto oldMeshes = m_meshListModel->rawData();
 	unloadMeshes();
 
-	std::jthread([this,
-	              oldMeshes = std::move(oldMeshes),
-	              origBasises = std::move(origBasises),
-	              resBasises = std::move(resBasises)] {
-		MeshList tMeshes;
+	//	std::jthread([this,
+	//	              oldMeshes = std::move(oldMeshes),
+	//	              origBasises = std::move(origBasises),
+	//	              resBasises = std::move(resBasises)] {
+	MeshList tMeshes;
 
-		for (const auto &mesh : oldMeshes) {
-			Mesh tMesh;
-			for (const auto &line : mesh) {
-				auto streightLine = MathUtils::getPolydotTransformedLine(
-				    line, origBasises, resBasises);
+	for (const auto &mesh : m_meshes) {
+		Mesh tMesh;
+		for (const auto &line : mesh) {
+			auto streightLine = MathUtils::getPolydotTransformedLine(line, origBasises, resBasises);
 
-				auto tLine = Line::FromStreightLine(streightLine);
-				// tLine.p1 *= -100;
-				// tLine.p2 *= 100;
-				if (!tLine.isNull()) {
-					tMesh.emplace_back(tLine);
-				}
+			auto tLine = Line::FromStreightLine(streightLine);
+			if (!tLine.isNull()) {
+				qDebug() << LineGeometry(tLine);
+				tMesh.emplace_back(tLine);
 			}
-			tMeshes.emplace_back(std::move(tMesh));
 		}
+		tMeshes.emplace_back(std::move(tMesh));
+	}
 
-		m_meshListModel = std::make_unique<MeshListModel>(std::move(tMeshes));
-		emit meshListModelChanged();
-	}).detach();
+	// tMeshes = Mes(tMeshes.begin()+3, tMeshes.end());
+	tMeshes = {tMeshes.front()};
+
+	m_meshListModel = std::make_unique<MeshListModel>(std::move(tMeshes));
+	emit meshListModelChanged();
+	//}).detach();
 }

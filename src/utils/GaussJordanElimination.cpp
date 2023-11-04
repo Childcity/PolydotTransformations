@@ -9,7 +9,7 @@ namespace gauss_jordan_elimination {
 
 namespace {
 
-Q_LOGGING_CATEGORY(gauss_jordan_elimination, "utils.gauss_jordan_elimination", QtInfoMsg);
+Q_LOGGING_CATEGORY(gauss_jordan_elimination, "utils.gauss_jordan_elimination", QtInfoMsg)
 
 using Array = std::vector<float>;
 

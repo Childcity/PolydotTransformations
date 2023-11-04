@@ -11,7 +11,7 @@
 
 namespace {
 
-Q_LOGGING_CATEGORY(polydot_line, "utils.polydot_line", QtInfoMsg);
+Q_LOGGING_CATEGORY(polydot_line, "utils.polydot_line", QtInfoMsg)
 
 constexpr float eps = std::numeric_limits<float>().epsilon();
 

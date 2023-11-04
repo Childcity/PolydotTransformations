@@ -1,8 +1,11 @@
 #include "GeometryPrimitives.h"
 
+#include <QLoggingCategory>
 #include <QVector3D>
 
 namespace {
+
+Q_LOGGING_CATEGORY(geometry, "utils.geometry", QtInfoMsg)
 
 using PType = float;
 constexpr int cPointDataCount = 3;
@@ -210,13 +213,14 @@ void PointGeometry::updateData()
 Line Line::FromStreightLine(StreightLine line)
 {
 	if (line.isNull()) {
-		// Q_ASSERT(false);
+		qCWarning(geometry) << __func__ << "line.isNull()";
 		return {};
 	}
 	const auto [A, B, C] = std::tuple{line.A, line.B, line.C};
+	const auto x1 = -100, x2 = 100;
 	return {
-	    .p1 = {0, -C / B, 0}, //
-	    .p2 = {1, (-A - C) / B, 0} //
+	    .p1 = {x1, (-A * x1 - C) / B, 0}, //
+	    .p2 = {x2, (-A * x2 - C) / B, 0} //
 	};
 }
 
@@ -247,7 +251,7 @@ bool StreightLine::isNull() const
 
 float StreightLine::length() const
 {
-	return std::hypot(A, B); // std::sqrt(A * A + B * B);
+	return std::hypot(A, B, 0.f); // std::sqrt(A * A + B * B);
 }
 
 bool StreightLine::isNormilized() const
