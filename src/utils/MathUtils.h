@@ -2,18 +2,27 @@
 
 #include <QObject>
 
+#include <models/GeometryPrimitives.h>
+
 class MathUtils : public QObject
 {
 	Q_OBJECT
 	Q_DISABLE_COPY(MathUtils)
 
 public:
-	static QObject *CreateInstance(class QQmlEngine *, class QJSEngine *);
+	static MathUtils &Get();
+	static QObject *Get(class QQmlEngine *, class QJSEngine *);
 
 	explicit MathUtils(QObject * = nullptr);
+	~MathUtils() override = default;
 
-	Q_INVOKABLE class LineGeometry *getPolydotLine(
-	    LineGeometry *line,
-	    const QVariantList &originalBasis,
-	    const QVariantList &resultBasis) const;
+	static StreightLine getPolydotTransformedLine(
+	    const Line &line, //
+	    const QVariantList &origBasises,
+	    const QVariantList &resBasises);
+
+	Q_INVOKABLE LineGeometry *getPolydotTransformedLine(
+	    const LineGeometry *line, //
+	    const QVariantList &origBasises,
+	    const QVariantList &resBasises);
 };

@@ -3,10 +3,6 @@
 #include <models/GeometryPrimitives.h>
 
 struct QXmlStreamReader;
-struct Line;
-
-using Mesh = std::vector<Line>;
-using Meshes = std::vector<Mesh>;
 
 class ColladaFormatImporter
 {
@@ -14,7 +10,7 @@ public:
 	explicit ColladaFormatImporter(const QString path);
 
 	void importGeometries();
-	Meshes getGeometries();
+	MeshList getGeometries();
 
 private:
 	void readCollada(QXmlStreamReader &reader);
@@ -23,5 +19,5 @@ private:
 
 private:
 	QString m_path;
-	Meshes m_meshes;
+	MeshList m_meshes;
 };

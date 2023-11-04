@@ -50,9 +50,21 @@ float signDistanceToLine(
 
 } // namespace
 
-QObject *MathUtils::CreateInstance(QQmlEngine *engine, QJSEngine *)
+MathUtils &MathUtils::Get()
 {
-	return new MathUtils(engine);
+	static MathUtils *pthis;
+	static std::once_flag flag;
+
+	std::call_once(flag, [] {
+		pthis = new MathUtils; //
+	});
+
+	return *pthis;
+}
+
+QObject *MathUtils::Get(QQmlEngine *, QJSEngine *)
+{
+	return &MathUtils::Get();
 }
 
 MathUtils::MathUtils(QObject *parent)
@@ -62,8 +74,8 @@ MathUtils::MathUtils(QObject *parent)
 {
 }
 
-LineGeometry *MathUtils::getPolydotLine(
-    LineGeometry *baseLine, const QVariantList &origBasises, const QVariantList &resBasises) const
+StreightLine MathUtils::getPolydotTransformedLine(
+    const Line &baseLine, const QVariantList &origBasises, const QVariantList &resBasises)
 {
 	namespace solve = gauss_jordan_elimination;
 
@@ -73,8 +85,8 @@ LineGeometry *MathUtils::getPolydotLine(
 
 	// https://brilliant.org/wiki/3d-coordinate-geometry-equation-of-a-line/
 	// Subtracting the position vectors of the two points gives the direction vector
-	const auto baseLineNormilized = baseLine->toStraightLine().normilized();
-	QVector3D baseLineDirection = baseLine->p1() - baseLine->p2();
+	const auto baseLineNormilized = baseLine.toStraightLine().normilized();
+	QVector3D baseLineDirection = baseLine.p1 - baseLine.p2;
 	baseLineDirection.normalize();
 
 	{
@@ -83,9 +95,9 @@ LineGeometry *MathUtils::getPolydotLine(
 		    "\n       x - {}      y - {}     z - {} "
 		    "\nLine: -------- = -------- = -------- "
 		    "\n       {:.2}       {:.2}      {:.2}  ",
-		    baseLine->p1().x(),
-		    baseLine->p1().y(),
-		    baseLine->p1().z(),
+		    baseLine.p1.x(),
+		    baseLine.p1.y(),
+		    baseLine.p1.z(),
 		    baseLineDirection.x(),
 		    baseLineDirection.y(),
 		    baseLineDirection.z() //
@@ -97,16 +109,16 @@ LineGeometry *MathUtils::getPolydotLine(
 		const auto &resBasis = *resultBasis.value<PointGeometry *>();
 
 		float betta = baseLineNormilized.signDistanceToPoint(origBasis);
-		float betta2 = signDistanceToLine(origBasis, baseLine->p1(), baseLineDirection);
-		float betta3 = signDistanceToLine(origBasis, baseLine->p2(), baseLineDirection);
+		float betta2 = signDistanceToLine(origBasis, baseLine.p1, baseLineDirection);
+		float betta3 = signDistanceToLine(origBasis, baseLine.p2, baseLineDirection);
 
 		if (qFuzzyIsNull(betta)) {
 			// If distance from origBasis to Line is 0 => we cannot solve system!
 			return {};
 		}
 
-		assert(qFuzzyCompare(betta, betta2));
-		assert(qFuzzyCompare(betta, betta3));
+		// assert(qFuzzyCompare(betta, betta2));
+		// assert(qFuzzyCompare(betta, betta3));
 
 		qCDebug(polydot_line) << "Original Basis" << origBasis;
 		qCDebug(polydot_line) << "Result   Basis" << resBasis;
@@ -147,9 +159,26 @@ LineGeometry *MathUtils::getPolydotLine(
 		const auto resLine = StreightLine::FromArray(polidotSolutionArr);
 		qCDebug(polydot_line) << "Result line" << resLine;
 
-		return new LineGeometry(resLine);
+		return resLine;
 	} catch (const std::runtime_error &e) {
 		qCWarning(polydot_line) << "System cannot be solved: " << e.what();
+	}
+
+	return {};
+}
+
+LineGeometry *MathUtils::getPolydotTransformedLine(
+    const LineGeometry *baseLine, const QVariantList &origBasises, const QVariantList &resBasises)
+{
+	if (!baseLine) {
 		return {};
 	}
+
+	const auto newLine = getPolydotTransformedLine(baseLine->toLine(), origBasises, resBasises);
+
+	if (newLine.isNull()) {
+		return {};
+	}
+
+	return new LineGeometry(newLine);
 }

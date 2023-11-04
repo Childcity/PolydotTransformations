@@ -5,8 +5,7 @@
 #include <models/GeometryPrimitives.h>
 #include <utils/MathUtils.h>
 
-#define REG_SINGLETON(type)                                                                        \
-	qmlRegisterSingletonType<type>(#type, 1, 0, #type, &type::CreateInstance)
+#define REG_SINGLETON(type) qmlRegisterSingletonType<type>(#type, 1, 0, #type, &type::Get)
 #define REG_TYPE(type) qmlRegisterType<type *>(#type, 1, 0, #type)
 
 int main(int argc, char *argv[])

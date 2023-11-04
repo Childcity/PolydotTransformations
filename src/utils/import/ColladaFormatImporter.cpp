@@ -8,7 +8,6 @@
 
 namespace {
 
-Q_DECLARE_LOGGING_CATEGORY(xml_importer);
 Q_LOGGING_CATEGORY(xml_importer, "xml_importer", QtInfoMsg);
 
 using namespace Qt::StringLiterals;
@@ -76,7 +75,7 @@ ColladaFormatImporter::ColladaFormatImporter(const QString path)
 {
 }
 
-Meshes ColladaFormatImporter::getGeometries()
+MeshList ColladaFormatImporter::getGeometries()
 {
 	return m_meshes;
 }

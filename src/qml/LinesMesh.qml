@@ -9,7 +9,7 @@ Node {
 	Repeater3D {
 		id: mesh
 
-		Loader3D {
+		delegate: Loader3D {
 			required property QtObject lineGeometry
 
 			asynchronous: true

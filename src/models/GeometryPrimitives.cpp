@@ -207,6 +207,29 @@ void PointGeometry::updateData()
 	update();
 }
 
+Line Line::FromStreightLine(StreightLine line)
+{
+	if (line.isNull()) {
+		// Q_ASSERT(false);
+		return {};
+	}
+	const auto [A, B, C] = std::tuple{line.A, line.B, line.C};
+	return {
+	    .p1 = {0, -C / B, 0}, //
+	    .p2 = {1, (-A - C) / B, 0} //
+	};
+}
+
+StreightLine Line::toStraightLine() const
+{
+	return StreightLine::FromLine(*this);
+}
+
+bool Line::isNull() const
+{
+	return qFuzzyIsNull(p1.distanceToPoint(p2));
+}
+
 StreightLine StreightLine::FromLine(Line line)
 {
 	// https://math.stackexchange.com/questions/637922/how-can-i-find-coefficients-a-b-c-given-two-points
@@ -215,6 +238,11 @@ StreightLine StreightLine::FromLine(Line line)
 	    line.p2.x() - line.p1.x(),
 	    line.p1.x() * line.p2.y() - line.p2.x() * line.p1.y(),
 	};
+}
+
+bool StreightLine::isNull() const
+{
+	return qFuzzyIsNull(length());
 }
 
 float StreightLine::length() const
@@ -247,9 +275,7 @@ float StreightLine::signDistanceToPoint(QVector3D p) const
 
 LineGeometry::LineGeometry(StreightLine line)
 {
-	const auto [A, B, C] = std::tuple{line.A, line.B, line.C};
-	m_line.p1 = {0, -C / B, 0};
-	m_line.p2 = {1, (-A - C) / B, 0};
+	m_line = Line::FromStreightLine(line);
 	updateData();
 }
 
@@ -309,9 +335,14 @@ void LineGeometry::setP2(QVector3D newP2)
 	updateData();
 }
 
-StreightLine LineGeometry::toStraightLine()
+StreightLine LineGeometry::toStraightLine() const
 {
 	return StreightLine::FromLine(m_line);
+}
+
+Line LineGeometry::toLine() const
+{
+	return m_line;
 }
 
 QDebug operator<<(QDebug dbg, const PointGeometry &geom)

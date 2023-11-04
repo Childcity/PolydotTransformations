@@ -2,7 +2,7 @@
 
 #include <QAbstractListModel>
 
-#include <models/GeometryPrimitives.h>
+#include "GeometryPrimitives.h"
 
 class LinesMeshModel : public QAbstractListModel
 {
@@ -14,12 +14,13 @@ public:
 		LineGeometryRole = Qt::UserRole + 1,
 	};
 
-	explicit LinesMeshModel(QObject *parent = nullptr);
+	explicit LinesMeshModel(const Mesh &mesh, QObject *parent = nullptr);
+	~LinesMeshModel() override = default;
 
 	QHash<int, QByteArray> roleNames() const override;
 	int rowCount(const QModelIndex &parent) const override;
 	QVariant data(const QModelIndex &index, int role) const override;
 
 private:
-	std::vector<std::unique_ptr<LineGeometry>> m_geometry;
+	std::vector<std::unique_ptr<class LineGeometry>> m_mesh;
 };

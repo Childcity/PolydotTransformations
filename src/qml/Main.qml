@@ -9,7 +9,7 @@ import PolydotTransformationUi
 import MathUtils
 
 ApplicationWindow {
-	id: window
+	id: root
 
 	visible: true
 
@@ -145,6 +145,7 @@ ApplicationWindow {
 
 			Model {
 				id: originalLine
+				visible: false
 				scale: Qt.vector3d(100, 100, 100)
 				geometry: LineGeometry {
 					p1: Qt.vector2d(0, 2)
@@ -155,7 +156,7 @@ ApplicationWindow {
 
 			Model {
 				id: resultLine
-
+				visible: false
 				scale: Qt.vector3d(100, 100, 100)
 				geometry: LineGeometry {
 					p1: Qt.vector2d(0, 0)
@@ -166,7 +167,10 @@ ApplicationWindow {
 				function update() {
 					const origBasises = [originBasis1.geom, originBasis2.geom, originBasis3.geom];
 					const resBasises = [resultBasis1.geom, resultBasis2.geom, resultBasis3.geom];
-					const resLineGeom = MathUtils.getPolydotLine(originalLine.geometry,
+
+					controller.applyPolydotTransformations(origBasises, resBasises);
+
+					const resLineGeom = MathUtils.getPolydotTransformedLine(originalLine.geometry,
 										origBasises, resBasises);
 					if (!resLineGeom) {
 						resultLine.geometry = LineGeometry;
@@ -177,7 +181,7 @@ ApplicationWindow {
 			}
 
 			MeshList {
-				//model: controller.
+				model: controller.meshListModel
 				scale: controller.globalScale
 			}
 		}
@@ -569,6 +573,16 @@ ApplicationWindow {
 	MainController {
 		id: controller
 	}
+
+	Connections {
+        target: Application
+
+        function onStateChanged() {
+			if (Application.state === Qt.ApplicationActive) {
+				controller.loadMeshes();
+			}
+        }
+    }
 
 //	Timeline {
 //		id: timeline

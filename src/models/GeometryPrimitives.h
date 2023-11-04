@@ -7,6 +7,7 @@ class ExampleTriangleGeometry : public QQuick3DGeometry
 {
 	Q_OBJECT
 	QML_NAMED_ELEMENT(ExampleTriangleGeometry)
+
 	Q_PROPERTY(bool normals READ normals WRITE setNormals NOTIFY normalsChanged)
 	Q_PROPERTY(float normalXY READ normalXY WRITE setNormalXY NOTIFY normalXYChanged)
 	Q_PROPERTY(bool uv READ uv WRITE setUV NOTIFY uvChanged)
@@ -70,6 +71,7 @@ class PointGeometry
 
 public:
 	explicit PointGeometry() = default;
+	~PointGeometry() override = default;
 
 	QVector3D point() const;
 	void setPoint(QVector3D newPoint);
@@ -81,11 +83,22 @@ private:
 	void updateData();
 };
 
+struct StreightLine;
+
 struct Line
 {
 	QVector3D p1;
 	QVector3D p2;
+
+	static Line FromStreightLine(StreightLine line);
+
+	StreightLine toStraightLine() const;
+
+	bool isNull() const;
 };
+
+using Mesh = std::vector<Line>;
+using MeshList = std::vector<Mesh>;
 
 struct StreightLine
 {
@@ -103,6 +116,8 @@ struct StreightLine
 	}
 
 	static StreightLine FromLine(Line line);
+
+	bool isNull() const;
 
 	float length() const;
 
@@ -125,6 +140,7 @@ public:
 	explicit LineGeometry() = default;
 	explicit LineGeometry(StreightLine line);
 	explicit LineGeometry(Line line);
+	~LineGeometry() override = default;
 
 	QVector3D p1() const;
 	void setP1(QVector3D newP1);
@@ -132,7 +148,8 @@ public:
 	QVector3D p2() const;
 	void setP2(QVector3D newP2);
 
-	StreightLine toStraightLine();
+	StreightLine toStraightLine() const;
+	Line toLine() const;
 
 signals:
 	void p1Changed();

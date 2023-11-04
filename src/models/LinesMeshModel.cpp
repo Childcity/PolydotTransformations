@@ -1,18 +1,10 @@
 #include "LinesMeshModel.h"
 
-#include <utils/import/ColladaFormatImporter.h>
-
-LinesMeshModel::LinesMeshModel(QObject *parent)
+LinesMeshModel::LinesMeshModel(const Mesh &mesh, QObject *parent)
     : QAbstractListModel(parent)
 {
-	const auto path = "C:\\Users\\Ariel\\Documents\\AAScetch\\exp\\Untitled.dae";
-	ColladaFormatImporter importer(path);
-	importer.importGeometries();
-
-	const auto geometries = importer.getGeometries();
-
-	for (auto &geom : geometries.front()) {
-		m_geometry.emplace_back(std::make_unique<LineGeometry>(geom));
+	for (const auto &line : mesh) {
+		m_mesh.emplace_back(std::make_unique<LineGeometry>(line));
 	}
 }
 
@@ -29,7 +21,7 @@ int LinesMeshModel::rowCount(const QModelIndex &parent) const
 		return 0;
 	}
 
-	return static_cast<int>(m_geometry.size());
+	return static_cast<int>(m_mesh.size());
 }
 
 QVariant LinesMeshModel::data(const QModelIndex &index, int role) const
@@ -42,7 +34,7 @@ QVariant LinesMeshModel::data(const QModelIndex &index, int role) const
 
 	switch (role) {
 	case LineGeometryRole:
-		return QVariant::fromValue(m_geometry.at(row).get());
+		return QVariant::fromValue(m_mesh.at(row).get());
 	default:
 		return {};
 	}
