@@ -13,7 +13,12 @@ namespace {
 
 Q_LOGGING_CATEGORY(polydot_line, "utils.polydot_line", QtInfoMsg)
 
-constexpr float eps = std::numeric_limits<float>().epsilon();
+constexpr double eps = std::numeric_limits<double>().epsilon();
+
+constexpr bool fuzzyCompare(auto p1, auto p2)
+{
+	return (std::abs(p1 - p2) * 100000. <= std::min(qAbs(p1), qAbs(p2)));
+}
 
 //  By|          .
 //  Ay| |B|   .       .
@@ -27,14 +32,15 @@ constexpr float eps = std::numeric_limits<float>().epsilon();
 // https://math.stackexchange.com/questions/805954/what-does-the-dot-product-of-two-vectors-represent
 // Ax*Bx + Ay*By = |A||B|cos(th)
 
-float signDistanceToLine(
+double signDistanceToLine(
     QVector3D point, // Point
     QVector3D linePoint, // Point on the Line
     QVector3D direction // Line direction vector
 )
 {
 	auto signLength = [](QVector3D vec) {
-		float sign = vec.x() + vec.y() + vec.z() < eps ? -1 : 1;
+		// TODO: recheck if it is correct way to get a signA!
+		auto sign = vec.x() + vec.y() + vec.z() < eps ? -1 : 1;
 		return sign * std::hypot(vec.x(), vec.y(), vec.z());
 	};
 
@@ -79,13 +85,13 @@ StreightLine MathUtils::getPolydotTransformedLine(
 {
 	namespace solve = gauss_jordan_elimination;
 
-	float a1{}, b1{}, c1{}, r1{}, //
+	double a1{}, b1{}, c1{}, r1{}, //
 	    a2{}, b2{}, c2{}, r2{}, //
 	    a3{}, b3{}, c3{}, r3{};
 
 	// https://brilliant.org/wiki/3d-coordinate-geometry-equation-of-a-line/
 	// Subtracting the position vectors of the two points gives the direction vector
-	const auto baseLineNormilized = baseLine.toStraightLine().normilized();
+	const StreightLine baseLineNormilized = baseLine.toStraightLine().normilized();
 	QVector3D baseLineDirection = baseLine.p1 - baseLine.p2;
 	baseLineDirection.normalize();
 
@@ -108,27 +114,28 @@ StreightLine MathUtils::getPolydotTransformedLine(
 		const auto &origBasis = *originalBasis.value<PointGeometry *>();
 		const auto &resBasis = *resultBasis.value<PointGeometry *>();
 
-		float betta = baseLineNormilized.signDistanceToPoint(origBasis);
-		float betta2 = signDistanceToLine(origBasis, baseLine.p1, baseLineDirection);
-		float betta3 = signDistanceToLine(origBasis, baseLine.p2, baseLineDirection);
+		double betta = baseLineNormilized.signDistanceToPoint(origBasis);
+		double betta2 = signDistanceToLine(origBasis, baseLine.p1, baseLineDirection);
+		double betta3 = signDistanceToLine(origBasis, baseLine.p2, baseLineDirection);
 
 		if (qFuzzyIsNull(betta)) {
 			// If distance from origBasis to Line is 0 => we cannot solve system!
 			return {};
 		}
 
-		// assert(qFuzzyCompare(betta, betta2));
-		// assert(qFuzzyCompare(betta, betta3));
-
 		qCDebug(polydot_line) << "Original Basis" << origBasis;
 		qCDebug(polydot_line) << "Result   Basis" << resBasis;
-		qCDebug(polydot_line) << "Betta" << betta << betta2 << betta3;
+		qCDebug(polydot_line)
+		    << "Betta" << std::format("{:.10} {:.10} {:.10}", betta, betta2, betta3);
 		qCDebug(polydot_line) << "-----------------------------------------";
 
-		float bettaSqure = betta * betta;
+		// assert(fuzzyCompare(betta, betta2));
+		// assert(fuzzyCompare(betta, betta3));
 
-		float x = resBasis.x();
-		float y = resBasis.y();
+		double bettaSqure = betta * betta;
+
+		double x = resBasis.x();
+		double y = resBasis.y();
 
 		a1 += x * x / bettaSqure;
 		b1 += x * y / bettaSqure;
@@ -142,8 +149,8 @@ StreightLine MathUtils::getPolydotTransformedLine(
 
 		a3 += x / bettaSqure;
 		b3 += y / bettaSqure;
-		c3 += 1.f / bettaSqure;
-		r3 += 1.f / betta;
+		c3 += 1. / bettaSqure;
+		r3 += 1. / betta;
 	}
 
 	const solve::Matrix polidotEquestion = {

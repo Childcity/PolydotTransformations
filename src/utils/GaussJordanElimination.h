@@ -5,7 +5,7 @@
 
 namespace gauss_jordan_elimination {
 
-using Matrix = std::vector<std::vector<float>>;
+using Matrix = std::vector<std::vector<double>>;
 
 // a - matrix Ab
 // n - order of Matrix(n)
@@ -16,7 +16,7 @@ using Matrix = std::vector<std::vector<float>>;
                   { 2, 1, 1, 7 }};
     b = 4, 6, 7
  */
-std::vector<float> SolveSystem(const Matrix &a);
+std::vector<double> SolveSystem(const Matrix &a);
 
 class NoSolutionError : public std::runtime_error
 {

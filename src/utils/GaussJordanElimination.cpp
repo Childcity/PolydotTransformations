@@ -11,7 +11,7 @@ namespace {
 
 Q_LOGGING_CATEGORY(gauss_jordan_elimination, "utils.gauss_jordan_elimination", QtInfoMsg)
 
-using Array = std::vector<float>;
+using Array = std::vector<double>;
 
 void writeLine(std::string_view line)
 {
@@ -38,7 +38,7 @@ int performOperation(Matrix &a)
 				break;
 			}
 			for (int j = i, k = 0; k <= n; k++) {
-				const float temp = a[j][k];
+				const auto temp = a[j][k];
 				a[j][k] = a[j + c][k];
 				a[j + c][k] = temp;
 			}
@@ -49,7 +49,7 @@ int performOperation(Matrix &a)
 			if (i != j) {
 				// Converting Matrix to reduced row
 				// echelon form(diagonal matrix)
-				const float p = a[j][i] / a[i][i];
+				const auto p = a[j][i] / a[i][i];
 				for (k = 0; k <= n; k++) {
 					a[j][k] = a[j][k] - (a[i][k]) * p;
 				}
@@ -78,15 +78,15 @@ Array getSolution(const Matrix &a, int flag)
 
 // To check whether infinite solutions
 // exists or no solution exists
-int checkConsistency(Matrix a, int flag)
+int checkConsistency(const Matrix &a)
 {
-	float sum{};
+	double sum{};
 
 	// flag == 2 for infinite solution
 	// flag == 3 for No solution
-	flag = 3;
+	int flag = 3;
 	for (int i = 0; i < a.size(); i++) {
-		sum = 0;
+		sum = 0.;
 
 		int j = 0;
 		for (; j < a.size(); j++) {
@@ -123,7 +123,7 @@ Array SolveSystem(const Matrix &inA)
 	int flag = performOperation(a);
 
 	if (flag == 1) {
-		flag = checkConsistency(a, flag);
+		flag = checkConsistency(a);
 	}
 
 	if (flag == 2) {

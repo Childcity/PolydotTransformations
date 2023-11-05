@@ -3,6 +3,8 @@
 #include <QLoggingCategory>
 #include <QVector3D>
 
+#include <utils/GaussJordanElimination.h>
+
 namespace {
 
 Q_LOGGING_CATEGORY(geometry, "utils.geometry", QtInfoMsg)
@@ -216,12 +218,34 @@ Line Line::FromStreightLine(StreightLine line)
 		qCWarning(geometry) << __func__ << "line.isNull()";
 		return {};
 	}
-	const auto [A, B, C] = std::tuple{line.A, line.B, line.C};
-	const auto x1 = -100, x2 = 100;
-	return {
-	    .p1 = {x1, (-A * x1 - C) / B, 0}, //
-	    .p2 = {x2, (-A * x2 - C) / B, 0} //
+
+	auto fuzzyIsNull = [](auto d) {
+		return qAbs(d) <= 0.000001;
 	};
+
+	const auto [A, B, C] = std::tuple{line.A, line.B, line.C};
+
+	if (fuzzyIsNull(B)) { // The line is parallel to Oy
+		auto x = [A, B, C](double y) -> float {
+			return (-B * y - C) / A;
+		};
+
+		const auto y1 = -10., y2 = 10.;
+		return {
+		    .p1 = {x(y1), y1, 0}, //
+		    .p2 = {x(y2), y2, 0} //
+		};
+	} else {
+		auto y = [A, B, C](double x) -> float {
+			return (-A * x - C) / B;
+		};
+
+		const auto x1 = -10., x2 = 10.;
+		return {
+		    .p1 = {x1, y(x1), 0}, //
+		    .p2 = {x2, y(x2), 0} //
+		};
+	}
 }
 
 StreightLine Line::toStraightLine() const
@@ -249,14 +273,14 @@ bool StreightLine::isNull() const
 	return qFuzzyIsNull(length());
 }
 
-float StreightLine::length() const
+double StreightLine::length() const
 {
 	return std::hypot(A, B, 0.f); // std::sqrt(A * A + B * B);
 }
 
 bool StreightLine::isNormilized() const
 {
-	const float len = length();
+	const double len = length();
 	return qFuzzyIsNull(len - 1.f) || qFuzzyIsNull(len);
 }
 
@@ -265,16 +289,29 @@ StreightLine StreightLine::normilized() const
 	if (isNormilized()) {
 		return *this;
 	}
-	const float len = length();
+	const auto len = length();
 	return {A / len, B / len, C / len};
 }
 
-float StreightLine::signDistanceToPoint(QVector3D p) const
+double StreightLine::signDistanceToPoint(QVector3D p) const
 {
 	if (!isNormilized()) {
 		qFatal("distanceToPoint must be called for normilized line!");
 	}
 	return A * p.x() + B * p.y() + C;
+}
+
+QVector3D StreightLine::intersect(StreightLine otherLine)
+{
+	namespace gauss = gauss_jordan_elimination;
+	const auto [A1, B1, C1] = this->toTuple();
+	const auto [A2, B2, C2] = otherLine.toTuple();
+	const auto point = gauss::SolveSystem({
+	    {A1, B1, -C1},
+	    {A2, B2, -C2},
+	});
+	assert(point.size() == 2);
+	return {static_cast<float>(point[0]), static_cast<float>(point[1]), 0};
 }
 
 LineGeometry::LineGeometry(StreightLine line)

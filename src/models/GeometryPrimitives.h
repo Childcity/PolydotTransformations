@@ -1,5 +1,7 @@
 #pragma once
 
+#include <tuple>
+
 #include <QQuick3DGeometry>
 #include <QVector3D>
 
@@ -102,9 +104,9 @@ using MeshList = std::vector<Mesh>;
 
 struct StreightLine
 {
-	float A{}; // Ax
-	float B{}; // By
-	float C{}; // C
+	double A{}; // Ax
+	double B{}; // By
+	double C{}; // C
 
 	template<typename Container>
 	    requires (std::ranges::input_range<Container>)
@@ -117,14 +119,21 @@ struct StreightLine
 
 	static StreightLine FromLine(Line line);
 
-	bool isNull() const;
+	// clang-format off
 
-	float length() const;
+	auto toTuple() { return std::tuple{A, B, C}; }
+
+	// clang-format on
+
+	bool isNull() const;
+	double length() const;
 
 	bool isNormilized() const;
 	StreightLine normilized() const;
 
-	float signDistanceToPoint(QVector3D p) const;
+	double signDistanceToPoint(QVector3D p) const;
+
+	QVector3D intersect(StreightLine otherLine);
 };
 
 class LineGeometry : public QQuick3DGeometry
