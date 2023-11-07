@@ -29,7 +29,7 @@ Item {
 		Label {
 			id: label
 
-			Layout.preferredWidth: 100
+			Layout.preferredWidth: 80
 
 			Layout.alignment: Qt.AlignLeft
 

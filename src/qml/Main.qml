@@ -97,49 +97,62 @@ ApplicationWindow {
 				lighting: DefaultMaterial.NoLighting
 				cullMode: DefaultMaterial.NoCulling
 				diffuseColor: "yellow"
-				pointSize: sliderPointSize.value * 100
-				lineWidth: sliderPointSize.value * 100
+				lineWidth: 7
 			}
 
 			PointWithName {
 				id: originBasis1
 				text: "Basis_1"
-				pos: Qt.vector2d(slBasis1X.value * 10, slBasis1Y.value * 10)
+				pos: basis1Sett.slOrgVector2d
 				onPosChanged: resultLine.update()
 			}
 
 			PointWithName {
 				id: resultBasis1
 				text: "Basis_1`"
-				pos: Qt.vector2d(slResBasis1X.value * 10, slResBasis1Y.value * 10)
+				pos: basis1Sett.slResVector2d
 				onPosChanged: resultLine.update()
 			}
 
 			PointWithName {
 				id: originBasis2
 				text: "Basis_2"
-				pos: Qt.vector2d(slBasis2X.value * 10, slBasis2Y.value * 10)
+				pos: basis2Sett.slOrgVector2d
 				onPosChanged: resultLine.update()
 			}
 
 			PointWithName {
 				id: resultBasis2
 				text: "Basis_2`"
-				pos: Qt.vector2d(slResBasis2X.value * 10, slResBasis2Y.value * 10)
+				pos: basis2Sett.slResVector2d
 				onPosChanged: resultLine.update()
 			}
 
 			PointWithName {
 				id: originBasis3
 				text: "Basis_3"
-				pos: Qt.vector2d(slBasis3X.value * 10, slBasis3Y.value * 10)
+				pos: basis3Sett.slOrgVector2d
 				onPosChanged: resultLine.update()
 			}
 
 			PointWithName {
 				id: resultBasis3
 				text: "Basis_3`"
-				pos: Qt.vector2d(slResBasis3X.value * 10, slResBasis3Y.value * 10)
+				pos: basis3Sett.slResVector2d
+				onPosChanged: resultLine.update()
+			}
+
+			PointWithName {
+				id: originBasis4
+				text: "Basis_4"
+				pos: basis4Sett.slOrgVector2d
+				onPosChanged: resultLine.update()
+			}
+
+			PointWithName {
+				id: resultBasis4
+				text: "Basis_4`"
+				pos: basis4Sett.slResVector2d
 				onPosChanged: resultLine.update()
 			}
 
@@ -165,8 +178,8 @@ ApplicationWindow {
 				materials: [ polidotMaterial ]
 
 				function update() {
-					const origBasises = [originBasis1.geom, originBasis2.geom, originBasis3.geom];
-					const resBasises = [resultBasis1.geom, resultBasis2.geom, resultBasis3.geom];
+					const origBasises = [originBasis1.geom, originBasis2.geom, originBasis3.geom, originBasis4.geom];
+					const resBasises = [resultBasis1.geom, resultBasis2.geom, resultBasis3.geom, resultBasis4.geom];
 
 					controller.applyPolydotTransformations(origBasises, resBasises);
 
@@ -239,47 +252,6 @@ ApplicationWindow {
 					}
 				}
 			}
-
-			Pane {
-				id: gridSettings
-				visible: false
-				ColumnLayout {
-					Button {
-						text: "+ Y Cells"
-						onClicked: grid.horizontalLines += 1
-						Layout.alignment: Qt.AlignHCenter
-
-					}
-					RowLayout {
-						Layout.alignment: Qt.AlignHCenter
-						Button  {
-							text: "- X Cells"
-							onClicked: grid.verticalLines -= 1
-						}
-						Button {
-							text: "+ X Cells"
-							onClicked: grid.verticalLines += 1
-						}
-					}
-					Button  {
-						text: "- Y Cells"
-						onClicked: grid.horizontalLines -= 1
-						Layout.alignment: Qt.AlignHCenter
-					}
-
-					Label {
-						text: "Line width (if supported)"
-					}
-					Slider {
-						Layout.fillWidth: true
-						id: sliderLineWidth
-						from: 1.0
-						to: 10.0
-						stepSize: 0.5
-						value: 1.0
-					}
-				}
-			}
 			Pane {
 				id: triangleSettings
 				visible: false
@@ -334,135 +306,95 @@ ApplicationWindow {
 			Pane {
 				id: geometrySettings
 
-				property int sliderWidth: 100
-
 				visible: false
+
+				component BasisSettings: ColumnLayout {
+					id: bRoot
+
+					property int sliderWidth: 100
+
+					property alias useSlRes: swType.checked
+
+					property int index: 1
+					property string slOrgText: "Basis" + bRoot.index
+					property string slResText: "Basis" + bRoot.index + swType.text
+
+					readonly property vector2d slOrgVector2d: Qt.vector2d(slX.value * 10, slY.value * 10)
+					readonly property vector2d slResVector2d: Qt.vector2d(sl1X.value * 10, sl1Y.value * 10)
+
+					RowLayout {
+						Switch {
+							id: swType
+
+							Layout.alignment: Qt.AlignHCenter
+
+							checked: true
+							text: "`"
+						}
+
+						StackLayout {
+							currentIndex: bRoot.useSlRes
+
+							ColumnLayout {
+								TextWithSlider {
+									id: slX
+
+									sliderWidth: bRoot.sliderWidth
+									labelText: bRoot.slOrgText + " X:"
+									value: 0.2
+								}
+								TextWithSlider {
+									id: slY
+
+									sliderWidth: bRoot.sliderWidth
+									labelText: bRoot.slOrgText + " Y:"
+									value: 0.2
+								}
+							}
+							Column {
+								TextWithSlider {
+									id: sl1X
+
+									sliderWidth: bRoot.sliderWidth
+									labelText: bRoot.slResText + " X:"
+									value: 0.2
+								}
+								TextWithSlider {
+									id: sl1Y
+
+									sliderWidth: bRoot.sliderWidth
+									labelText: bRoot.slResText + " Y:"
+									value: 0.2
+								}
+							}
+						}
+					}
+
+					MenuSeparator {
+						Layout.preferredWidth: sl1X.implicitWidth + swType.implicitWidth
+					}
+				}
 
 				ColumnLayout {
 					anchors.left: parent.left
 					anchors.right: parent.right
 
-					TextWithSlider {
-						id: sliderPointSize
-
-						visible: false
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Point size:"
-						minValue: 0.01
-						maxValue: 0.16
-						step: 0.01
-						value: 0.07
+					BasisSettings {
+						id: basis1Sett
+						index: 1
 					}
 
-					TextWithSlider {
-						id: slBasis1X
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Basis1 X:"
-						value: 0.2
+					BasisSettings {
+						id: basis2Sett
+						index: 2
 					}
-
-					TextWithSlider {
-						id: slBasis1Y
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Basis1 Y:"
-						value: 0.2
+					BasisSettings {
+						id: basis3Sett
+						index: 3
 					}
-
-					TextWithSlider {
-						id: slResBasis1X
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Basis1` X:"
-						value: 0.6
-					}
-
-					TextWithSlider {
-						id: slResBasis1Y
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Basis1` Y:"
-						value: 0.4
-					}
-
-					MenuSeparator {
-						Layout.preferredWidth: parent.implicitWidth
-						padding: 0
-					}
-
-					// Basis2
-
-					TextWithSlider {
-						id: slBasis2X
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Basis2 X:"
-						value: 0.4
-					}
-
-					TextWithSlider {
-						id: slBasis2Y
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Basis2 Y:"
-						value: 0.1
-					}
-
-					TextWithSlider {
-						id: slResBasis2X
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Basis2` X:"
-						value: 0.7
-					}
-
-					TextWithSlider {
-						id: slResBasis2Y
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Basis2` Y:"
-						value: 0.3
-					}
-
-					MenuSeparator {
-						Layout.preferredWidth: parent.implicitWidth
-						padding: 0
-					}
-
-					// Basis3
-
-					TextWithSlider {
-						id: slBasis3X
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Basis3 X:"
-						value: 0.4
-					}
-
-					TextWithSlider {
-						id: slBasis3Y
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Basis3 Y:"
-						value: 0.1
-					}
-
-					TextWithSlider {
-						id: slResBasis3X
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Basis3` X:"
-						value: 0.7
-					}
-
-					TextWithSlider {
-						id: slResBasis3Y
-
-						sliderWidth: geometrySettings.sliderWidth
-						labelText: "Basis3` Y:"
-						value: 0.3
+					BasisSettings {
+						id: basis4Sett
+						index: 4
 					}
 				}
 			}

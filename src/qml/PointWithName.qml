@@ -25,8 +25,7 @@ Node {
 				lighting: DefaultMaterial.NoLighting
 				cullMode: DefaultMaterial.NoCulling
 				diffuseColor: "lightblue"
-				pointSize: sliderPointSize.value * 100
-				lineWidth: pointSize
+				pointSize: 10
 			}
 		]
 	}
@@ -39,7 +38,7 @@ Node {
 			id: label
 
 			anchors.centerIn: parent
-			font.pixelSize: 16
+			font.pointSize: 24
 			color: "#e0e0e0"
 			style: Text.Raised
 		}

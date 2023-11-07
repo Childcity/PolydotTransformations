@@ -230,7 +230,7 @@ Line Line::FromStreightLine(StreightLine line)
 			return (-B * y - C) / A;
 		};
 
-		const auto y1 = -10., y2 = 10.;
+		const auto y1 = -100., y2 = 100.;
 		return {
 		    .p1 = {x(y1), y1, 0}, //
 		    .p2 = {x(y2), y2, 0} //
@@ -240,7 +240,7 @@ Line Line::FromStreightLine(StreightLine line)
 			return (-A * x - C) / B;
 		};
 
-		const auto x1 = -10., x2 = 10.;
+		const auto x1 = -100., x2 = 100.;
 		return {
 		    .p1 = {x1, y(x1), 0}, //
 		    .p2 = {x2, y(x2), 0} //

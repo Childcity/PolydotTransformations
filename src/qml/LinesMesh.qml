@@ -20,7 +20,7 @@ Node {
 					DefaultMaterial {
 						lighting: DefaultMaterial.NoLighting
 						cullMode: DefaultMaterial.NoCulling
-						diffuseColor: "green"
+						diffuseColor: "lightgreen"
 						lineWidth: 3
 					}
 				]
