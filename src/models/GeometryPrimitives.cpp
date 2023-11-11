@@ -301,11 +301,11 @@ double StreightLine::signDistanceToPoint(QVector3D p) const
 	return A * p.x() + B * p.y() + C;
 }
 
-QVector3D StreightLine::intersect(StreightLine otherLine)
+QVector3D StreightLine::intersect(StreightLine other)
 {
 	namespace gauss = gauss_jordan_elimination;
 	const auto [A1, B1, C1] = this->toTuple();
-	const auto [A2, B2, C2] = otherLine.toTuple();
+	const auto [A2, B2, C2] = other.toTuple();
 	const auto point = gauss::SolveSystem({
 	    {A1, B1, -C1},
 	    {A2, B2, -C2},

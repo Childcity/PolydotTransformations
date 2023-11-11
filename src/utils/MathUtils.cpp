@@ -12,6 +12,7 @@
 namespace {
 
 Q_LOGGING_CATEGORY(polydot_line, "utils.polydot_line", QtInfoMsg)
+Q_LOGGING_CATEGORY(polydot_mesh, "utils.polydot_mesh", QtInfoMsg)
 
 constexpr double eps = std::numeric_limits<double>().epsilon();
 
@@ -188,4 +189,69 @@ LineGeometry *MathUtils::getPolydotTransformedLine(
 	}
 
 	return new LineGeometry(newLine);
+}
+
+// Apply Polidot Transformations for each line (Result is StreightLine).
+// Find intersecations between StreightLines.
+// Compose new lines from points, received from p2
+Mesh MathUtils::getPolydotTransformedMesh(
+    Mesh inMesh, const QVariantList &origBasises, const QVariantList &resBasises)
+{
+	assert(!inMesh.empty());
+	// assert(inMesh.size() % 2 == 0);
+
+	//	Simple Mesh of 4 lines:
+	//
+	//	            line2
+	//         p1            p2
+	//           ____________
+	//	        |           |
+	//	        |           |
+	//    line1 |           |  line3
+	//	        |           |
+	//	        |___________|
+	//        p4             p3
+	//              line4
+
+	// To find last intersection point, copy first line to the end
+	// Now: line1, line2, line3, line4, line1
+	inMesh.emplace_back(inMesh.front());
+
+	std::vector<QVector3D> linesIntersections;
+	StreightLine leftTransformedLine = MathUtils::getPolydotTransformedLine(
+	    inMesh.front(), origBasises, resBasises); // line1
+
+	for (const auto &line : inMesh | std::views::drop(1)) { // Skip line1
+		StreightLine rightTransformedLine = MathUtils::getPolydotTransformedLine(
+		    line, origBasises, resBasises);
+
+		try {
+			QVector3D intersectionPoint = leftTransformedLine.intersect(rightTransformedLine);
+			linesIntersections.emplace_back(intersectionPoint);
+		} catch (...) {
+			qCWarning(polydot_mesh)
+			    << "Feiled to fined intersection of " << leftTransformedLine
+			    << rightTransformedLine;
+			try {
+				rightTransformedLine *= 10;
+				QVector3D intersectionPoint = leftTransformedLine.intersect(rightTransformedLine);
+				linesIntersections.emplace_back(intersectionPoint);
+			} catch (...) {
+				qCCritical(polydot_mesh)
+				    << "Feiled to fined intersection of " << leftTransformedLine
+				    << rightTransformedLine;
+			}
+		}
+		leftTransformedLine = rightTransformedLine;
+	}
+
+	Mesh outMesh;
+	QVector3D leftPoint = linesIntersections.back(); // p4
+	for (auto rightPoint : linesIntersections | std::views::take(linesIntersections.size())) {
+		outMesh.emplace_back(leftPoint, rightPoint); // Create and add new line
+		leftPoint = rightPoint;
+	}
+
+	assert((inMesh.size() - 1) == outMesh.size());
+	return outMesh;
 }

@@ -119,6 +119,22 @@ struct StreightLine
 
 	static StreightLine FromLine(Line line);
 
+	StreightLine &operator*=(double cnst)
+	{
+		A *= cnst;
+		B *= cnst;
+		C *= cnst;
+		return *this;
+	}
+
+	StreightLine &operator+=(double cnst)
+	{
+		A += cnst;
+		B += cnst;
+		C += cnst;
+		return *this;
+	}
+
 	// clang-format off
 
 	auto toTuple() { return std::tuple{A, B, C}; }
@@ -133,7 +149,7 @@ struct StreightLine
 
 	double signDistanceToPoint(QVector3D p) const;
 
-	QVector3D intersect(StreightLine otherLine);
+	QVector3D intersect(StreightLine other);
 };
 
 class LineGeometry : public QQuick3DGeometry

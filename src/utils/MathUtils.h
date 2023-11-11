@@ -25,4 +25,9 @@ public:
 	    const LineGeometry *line, //
 	    const QVariantList &origBasises,
 	    const QVariantList &resBasises);
+
+	static Mesh getPolydotTransformedMesh(
+	    Mesh mesh, //
+	    const QVariantList &origBasises,
+	    const QVariantList &resBasises);
 };

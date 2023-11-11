@@ -50,65 +50,33 @@ void MainController::applyPolydotTransformations(QVariantList origBasises, QVari
 
 	unloadMeshes();
 
-	// std::jthread([this,
-	//               origBasises = std::move(origBasises),
-	//               resBasises = std::move(resBasises)] {
 	MeshList tMeshes;
 
-	for (const auto &mesh : m_meshes) {
-		Mesh tMesh;
-		for (const auto &line : mesh) {
-			auto streightLine = MathUtils::getPolydotTransformedLine(line, origBasises, resBasises);
-
-			auto tLine = Line::FromStreightLine(streightLine);
-
-			if (!tLine.isNull()) {
-				tMesh.emplace_back(tLine);
-			}
-		}
-		tMeshes.emplace_back(std::move(tMesh));
-	}
-
-	//	for (auto mesh : m_meshes) {
+	//	for (const auto &mesh : m_meshes) {
 	//		Mesh tMesh;
+	//		for (const auto &line : mesh) {
+	//			auto streightLine = MathUtils::getPolydotTransformedLine(line, origBasises, resBasises);
 
-	//		// assert(mesh.size() % 2 == 0);
-	//		if (mesh.size() % 2 != 0) {
-	//			auto lastLine = mesh.back();
-	//			lastLine.p1 += {0.001, 0.001, 0};
-	//			mesh.emplace_back(lastLine);
-	//		}
+	//			auto tLine = Line::FromStreightLine(streightLine);
 
-	//		// to find last intersection point, we copy first line to the end
-	//		mesh.emplace_back(mesh.front());
-
-	//		std::vector<QVector3D> transformedPoints;
-	//		auto lastTransformedLine = MathUtils::getPolydotTransformedLine(
-	//		    mesh.front(), origBasises, resBasises);
-
-	//		for (const auto &line : mesh | std::views::drop(1)) {
-	//			auto streightLine = MathUtils::getPolydotTransformedLine(line, origBasises,
-	// resBasises); 			QVector3D intersection; 			try { 				intersection
-	// = lastTransformedLine.intersect(streightLine); 			} catch (...) { 				try {
-	// streightLine.A += 0.000000001; 					streightLine.B += 0.000000001;
-	// streightLine.C += 0.000000001; 					intersection =
-	// lastTransformedLine.intersect(streightLine); 				} catch (...) {
-	//				}
+	//			if (!tLine.isNull()) {
+	//				tMesh.emplace_back(tLine);
 	//			}
-	//			transformedPoints.emplace_back(intersection);
-	//			lastTransformedLine = streightLine;
 	//		}
-
-	//		QVector3D lastPoint = transformedPoints.back();
-	//		for (auto p : transformedPoints | std::views::take(transformedPoints.size())) {
-	//			tMesh.emplace_back(lastPoint, p);
-	//			lastPoint = p;
-	//		}
-
 	//		tMeshes.emplace_back(std::move(tMesh));
 	//	}
 
+	for (Mesh mesh : m_meshes) {
+		if (mesh.size() % 2 != 0) {
+			auto lastLine = mesh.back();
+			lastLine.p1 += {0.001, 0.001, 0};
+			// mesh.emplace_back(lastLine);
+		}
+
+		mesh = MathUtils::getPolydotTransformedMesh(std::move(mesh), origBasises, resBasises);
+		tMeshes.emplace_back(std::move(mesh));
+	}
+
 	m_meshListModel = std::make_unique<MeshListModel>(std::move(tMeshes));
 	emit meshListModelChanged();
-	//}).detach();
 }
