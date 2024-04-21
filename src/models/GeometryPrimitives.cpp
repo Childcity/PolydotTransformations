@@ -33,6 +33,11 @@ constexpr int cPointDataSize = cPointDataCount * sizeof(PType);
 
 //} // namespace std
 
+float toF(double v)
+{
+	return static_cast<float>(v);
+}
+
 void setPoint(QByteArray &data, int pointIndex, QVector3D point)
 {
 	PType *ptr = reinterpret_cast<PType *>(data.begin());
@@ -227,23 +232,23 @@ Line Line::FromStreightLine(StreightLine line)
 
 	if (fuzzyIsNull(B)) { // The line is parallel to Oy
 		auto x = [A, B, C](double y) -> float {
-			return (-B * y - C) / A;
+			return toF((-B * y - C) / A);
 		};
 
 		const auto y1 = -100., y2 = 100.;
 		return {
-		    .p1 = {x(y1), y1, 0}, //
-		    .p2 = {x(y2), y2, 0} //
+		    .p1 = {x(y1), toF(y1), 0}, //
+		    .p2 = {x(y2), toF(y2), 0} //
 		};
 	} else {
 		auto y = [A, B, C](double x) -> float {
-			return (-A * x - C) / B;
+			return toF((-A * x - C) / B);
 		};
 
 		const auto x1 = -100., x2 = 100.;
 		return {
-		    .p1 = {x1, y(x1), 0}, //
-		    .p2 = {x2, y(x2), 0} //
+		    .p1 = {toF(x1), y(x1), 0}, //
+		    .p2 = {toF(x2), y(x2), 0} //
 		};
 	}
 }

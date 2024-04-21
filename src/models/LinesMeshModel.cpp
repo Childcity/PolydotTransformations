@@ -8,6 +8,8 @@ LinesMeshModel::LinesMeshModel(const Mesh &mesh, QObject *parent)
 	}
 }
 
+LinesMeshModel::~LinesMeshModel() = default;
+
 QHash<int, QByteArray> LinesMeshModel::roleNames() const
 {
 	return {

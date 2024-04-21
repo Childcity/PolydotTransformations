@@ -1,21 +1,12 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <set>
 
-#include <controllers/MainController.h>
-#include <models/GeometryPrimitives.h>
-#include <utils/MathUtils.h>
-
-#define REG_SINGLETON(type) qmlRegisterSingletonType<type>(#type, 1, 0, #type, &type::Get)
-#define REG_TYPE(type) qmlRegisterType<type *>(#type, 1, 0, #type)
+#include <utils/MetaUtils.h>
 
 int main(int argc, char *argv[])
 {
-	{
-		REG_SINGLETON(MathUtils);
-		REG_TYPE(PointGeometry);
-		REG_TYPE(LineGeometry);
-		REG_TYPE(MainController);
-	}
+	MetaUtils::RegisterMetaTypes();
 
 	QGuiApplication app(argc, argv);
 	app.setOrganizationName("Childcity");

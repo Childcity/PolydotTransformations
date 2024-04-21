@@ -24,7 +24,7 @@ Node {
 
 				lighting: DefaultMaterial.NoLighting
 				cullMode: DefaultMaterial.NoCulling
-				diffuseColor: "lightblue"
+				diffuseColor: useStreightLine.checked ? "darkgreen" : "lightblue"
 				pointSize: 10
 			}
 		]

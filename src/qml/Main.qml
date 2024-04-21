@@ -6,7 +6,6 @@ import QtQuick3D
 import QtQuick3D.Helpers
 
 import PolydotTransformationUi
-import MathUtils
 
 ApplicationWindow {
 	id: root
@@ -33,7 +32,7 @@ ApplicationWindow {
 			antialiasingQuality: SceneEnvironment.VeryHigh
 
 			backgroundMode: SceneEnvironment.Color
-			clearColor: "#002b36"
+			clearColor: useArticleColors.checked ? "white" : "#002b36"
 		}
 
 		Node {
@@ -61,7 +60,7 @@ ApplicationWindow {
 		AxisHelper {
 			enableXZGrid: false
 			enableXYGrid: true
-			gridColor: Qt.rgba(0.8, 0.8, 0.8, 0.5)
+			gridColor: useArticleColors.checked ? Qt.rgba(0.3, 0.3, 0.3, 0.8) : Qt.rgba(0.8, 0.8, 0.8, 0.5)
 		}
 
 		Model {
@@ -96,68 +95,76 @@ ApplicationWindow {
 				id: polidotMaterial
 				lighting: DefaultMaterial.NoLighting
 				cullMode: DefaultMaterial.NoCulling
-				diffuseColor: "yellow"
+				diffuseColor: useArticleColors.checked ? "black" : "yellow"
 				lineWidth: 7
 			}
 
 			PointWithName {
 				id: originBasis1
+				visible: basis1Sett.showOrgRes
 				text: "Basis_1"
 				pos: basis1Sett.slOrgVector2d
-				onPosChanged: resultLine.update()
+				onPosChanged: internal.updateGeometry()
 			}
 
 			PointWithName {
 				id: resultBasis1
+				visible: basis1Sett.showOrgRes
 				text: "Basis_1`"
 				pos: basis1Sett.slResVector2d
-				onPosChanged: resultLine.update()
+				onPosChanged: internal.updateGeometry()
 			}
 
 			PointWithName {
 				id: originBasis2
+				visible: basis2Sett.showOrgRes
 				text: "Basis_2"
 				pos: basis2Sett.slOrgVector2d
-				onPosChanged: resultLine.update()
+				onPosChanged: internal.updateGeometry()
 			}
 
 			PointWithName {
 				id: resultBasis2
+				visible: basis2Sett.showOrgRes
 				text: "Basis_2`"
 				pos: basis2Sett.slResVector2d
-				onPosChanged: resultLine.update()
+				onPosChanged: internal.updateGeometry()
 			}
 
 			PointWithName {
 				id: originBasis3
+				visible: basis3Sett.showOrgRes
 				text: "Basis_3"
 				pos: basis3Sett.slOrgVector2d
-				onPosChanged: resultLine.update()
+				onPosChanged: internal.updateGeometry()
 			}
 
 			PointWithName {
 				id: resultBasis3
+				visible: basis3Sett.showOrgRes
 				text: "Basis_3`"
 				pos: basis3Sett.slResVector2d
-				onPosChanged: resultLine.update()
+				onPosChanged: internal.updateGeometry()
 			}
 
 			PointWithName {
 				id: originBasis4
+				visible: basis4Sett.showOrgRes
 				text: "Basis_4"
 				pos: basis4Sett.slOrgVector2d
-				onPosChanged: resultLine.update()
+				onPosChanged: internal.updateGeometry()
 			}
 
 			PointWithName {
 				id: resultBasis4
+				visible: basis4Sett.showOrgRes
 				text: "Basis_4`"
 				pos: basis4Sett.slResVector2d
-				onPosChanged: resultLine.update()
+				onPosChanged: internal.updateGeometry()
 			}
 
 			Model {
-				id: originalLine
+				id: testSingleOriginalLine
 				visible: false
 				scale: Qt.vector3d(100, 100, 100)
 				geometry: LineGeometry {
@@ -168,34 +175,20 @@ ApplicationWindow {
 			}
 
 			Model {
-				id: resultLine
-				visible: false
+				id: testSingleLine
+				visible: true
 				scale: Qt.vector3d(100, 100, 100)
 				geometry: LineGeometry {
 					p1: Qt.vector2d(0, 0)
 					p2: Qt.vector2d(0, 1)
 				}
 				materials: [ polidotMaterial ]
-
-				function update() {
-					const origBasises = [originBasis1.geom, originBasis2.geom, originBasis3.geom, originBasis4.geom];
-					const resBasises = [resultBasis1.geom, resultBasis2.geom, resultBasis3.geom, resultBasis4.geom];
-
-					controller.applyPolydotTransformations(origBasises, resBasises);
-
-					const resLineGeom = MathUtils.getPolydotTransformedLine(originalLine.geometry,
-										origBasises, resBasises);
-					if (!resLineGeom) {
-						resultLine.geometry = LineGeometry;
-						return;
-					}
-					resultLine.geometry = resLineGeom;
-				}
 			}
 
 			MeshList {
 				model: controller.meshListModel
 				scale: controller.globalScale
+				color: useArticleColors.checked ? "black" : "lightgreen"
 			}
 		}
 
@@ -315,21 +308,32 @@ ApplicationWindow {
 
 					property alias useSlRes: swType.checked
 
-					property int index: 1
+					property int index: -1
 					property string slOrgText: "Basis" + bRoot.index
 					property string slResText: "Basis" + bRoot.index + swType.text
 
-					readonly property vector2d slOrgVector2d: Qt.vector2d(slX.value * 10, slY.value * 10)
-					readonly property vector2d slResVector2d: Qt.vector2d(sl1X.value * 10, sl1Y.value * 10)
+					readonly property vector2d slOrgVector2d: Qt.vector2d(slX.value, slY.value)
+					readonly property vector2d slResVector2d: Qt.vector2d(sl1X.value, sl1Y.value)
+					property alias showOrgRes: cbVisible.checked
 
 					RowLayout {
-						Switch {
-							id: swType
+						ColumnLayout {
+							Switch {
+								id: swType
 
-							Layout.alignment: Qt.AlignHCenter
+								Layout.alignment: Qt.AlignHCenter
 
-							checked: true
-							text: "`"
+								checked: true
+								text: "`"
+							}
+
+							CheckBox {
+								id: cbVisible
+
+								Layout.alignment: Qt.AlignHCenter
+
+								checked: true
+							}
 						}
 
 						StackLayout {
@@ -341,14 +345,14 @@ ApplicationWindow {
 
 									sliderWidth: bRoot.sliderWidth
 									labelText: bRoot.slOrgText + " X:"
-									value: 0.2
+									value: 2; minValue: -10; maxValue: 10; step: 1
 								}
 								TextWithSlider {
 									id: slY
 
 									sliderWidth: bRoot.sliderWidth
 									labelText: bRoot.slOrgText + " Y:"
-									value: 0.2
+									value: 2; minValue: -10; maxValue: 10; step: 1
 								}
 							}
 							Column {
@@ -357,14 +361,14 @@ ApplicationWindow {
 
 									sliderWidth: bRoot.sliderWidth
 									labelText: bRoot.slResText + " X:"
-									value: 0.2
+									value: 2; minValue: -10; maxValue: 10; step: 1
 								}
 								TextWithSlider {
 									id: sl1Y
 
 									sliderWidth: bRoot.sliderWidth
 									labelText: bRoot.slResText + " Y:"
-									value: 0.2
+									value: 2; minValue: -10; maxValue: 10; step: 1
 								}
 							}
 						}
@@ -454,6 +458,19 @@ ApplicationWindow {
 					}
 				}
 			}
+
+			Switch {
+				id: useStreightLine
+				Layout.alignment: Qt.AlignLeft
+				text: "Use Streight Lines"
+			}
+
+			Switch {
+				id: useArticleColors
+				Layout.alignment: Qt.AlignLeft
+				text: "Black & White"
+			}
+
 			//DebugView {
 			//	 source: v3d
 			//	 resourceDetailsVisible: true
@@ -480,7 +497,7 @@ ApplicationWindow {
 					geometrySettings.visible: true
 					env.debugSettings.wireframeEnabled: false
 					//originNode.position: Qt.vector3d(0, 0, 0)
-					originNode.rotation: Qt.quaternion(1, 0, 0, 0)
+					originNode.rotation: Qt.quaternion(1, 1, 0, 0)
 					//cameraNode.z: 600
 				}
 			},
@@ -504,6 +521,10 @@ ApplicationWindow {
 
 	MainController {
 		id: controller
+
+		meshType: useStreightLine.checked ? MeshType.StreightLineMesh :  MeshType.ClosedMesh
+		onMeshTypeChanged: internal.updateGeometry()
+		onLoadComplete: internal.updateGeometry()
 	}
 
 	Connections {
@@ -515,6 +536,37 @@ ApplicationWindow {
 			}
         }
     }
+
+	Settings {
+		location: "file:settings.ini"
+		category: "Main"
+
+		property alias useStreightLine: useStreightLine.checked
+		property alias useArticleColors: useArticleColors.checked
+	}
+
+	QtObject {
+		id: internal
+
+		function updateGeometry() {
+			const origBasises = [originBasis1.geom, originBasis2.geom, originBasis3.geom, originBasis4.geom];
+			const resBasises = [resultBasis1.geom, resultBasis2.geom, resultBasis3.geom, resultBasis4.geom];
+
+			controller.applyPolydotTransformations(origBasises, resBasises);
+
+			//updateTestSingleLine();
+		}
+
+		function updateTestSingleLine() {
+			const resLineGeom = MathUtils.getPolydotTransformedLine(testSingleOriginalLine.geometry,
+								origBasises, resBasises);
+			if (!resLineGeom) {
+				testSingleLine.geometry = LineGeometry;
+				return;
+			}
+			testSingleLine.geometry = resLineGeom;
+		}
+	}
 
 //	Timeline {
 //		id: timeline

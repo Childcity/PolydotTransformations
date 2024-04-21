@@ -11,6 +11,8 @@ MeshListModel::MeshListModel(MeshList meshes, QObject *parent)
 	}
 }
 
+MeshListModel::~MeshListModel() = default;
+
 QHash<int, QByteArray> MeshListModel::roleNames() const
 {
 	return {

@@ -15,7 +15,7 @@ public:
 	};
 
 	explicit LinesMeshModel(const Mesh &mesh, QObject *parent = nullptr);
-	~LinesMeshModel() override = default;
+	~LinesMeshModel() override;
 
 	QHash<int, QByteArray> roleNames() const override;
 	int rowCount(const QModelIndex &parent) const override;

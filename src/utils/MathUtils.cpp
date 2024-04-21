@@ -75,9 +75,7 @@ QObject *MathUtils::Get(QQmlEngine *, QJSEngine *)
 }
 
 MathUtils::MathUtils(QObject *parent)
-    :
-
-    QObject(parent)
+    : QObject(parent)
 {
 }
 
@@ -232,17 +230,22 @@ Mesh MathUtils::getPolydotTransformedMesh(
 			qCWarning(polydot_mesh)
 			    << "Feiled to fined intersection of " << leftTransformedLine
 			    << rightTransformedLine;
-			try {
-				rightTransformedLine *= 10;
-				QVector3D intersectionPoint = leftTransformedLine.intersect(rightTransformedLine);
-				linesIntersections.emplace_back(intersectionPoint);
-			} catch (...) {
-				qCCritical(polydot_mesh)
-				    << "Feiled to fined intersection of " << leftTransformedLine
-				    << rightTransformedLine;
-			}
+			// try {
+			//	rightTransformedLine *= 10;
+			//	QVector3D intersectionPoint = leftTransformedLine.intersect(rightTransformedLine);
+			//	linesIntersections.emplace_back(intersectionPoint);
+			// } catch (...) {
+			//	qCCritical(polydot_mesh)
+			//	    << "Feiled to fined intersection of " << leftTransformedLine
+			//	    << rightTransformedLine;
+			// }
 		}
 		leftTransformedLine = rightTransformedLine;
+	}
+
+	if (linesIntersections.empty()) {
+		qCCritical(polydot_mesh) << "Feiled to apply Polidot transformations for the mesh!";
+		return {};
 	}
 
 	Mesh outMesh;
@@ -252,6 +255,25 @@ Mesh MathUtils::getPolydotTransformedMesh(
 		leftPoint = rightPoint;
 	}
 
-	assert((inMesh.size() - 1) == outMesh.size());
+	// assert((inMesh.size() - 1) == outMesh.size());
+	return outMesh;
+}
+
+Mesh MathUtils::getPolydotTransformedStreightLineMesh(
+    Mesh inMesh, const QVariantList &origBasises, const QVariantList &resBasises)
+{
+	Mesh outMesh;
+
+	for (const auto &inLine : inMesh) {
+		const auto outStreightLine = MathUtils::getPolydotTransformedLine(
+		    inLine, origBasises, resBasises);
+
+		auto outLine = Line::FromStreightLine(outStreightLine);
+		if (!outLine.isNull()) {
+			outMesh.emplace_back(std::move(outLine));
+		}
+	}
+
+	assert((inMesh.size()) == outMesh.size());
 	return outMesh;
 }

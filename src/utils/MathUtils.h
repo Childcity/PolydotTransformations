@@ -7,6 +7,8 @@
 class MathUtils : public QObject
 {
 	Q_OBJECT
+	QML_SINGLETON
+	QML_NAMED_ELEMENT(MathUtils)
 	Q_DISABLE_COPY(MathUtils)
 
 public:
@@ -27,6 +29,11 @@ public:
 	    const QVariantList &resBasises);
 
 	static Mesh getPolydotTransformedMesh(
+	    Mesh mesh, //
+	    const QVariantList &origBasises,
+	    const QVariantList &resBasises);
+
+	static Mesh getPolydotTransformedStreightLineMesh(
 	    Mesh mesh, //
 	    const QVariantList &origBasises,
 	    const QVariantList &resBasises);

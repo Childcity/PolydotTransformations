@@ -1,9 +1,11 @@
+import QtQuick
 import QtQuick3D
 
 Node {
 	id: root
 
 	property alias model: meshes.model
+	property color color: "black"
 
 	Repeater3D {
 		id: meshes
@@ -15,6 +17,7 @@ Node {
 
 			LinesMesh {
 				model: linesMeshModel
+				color: root.color
 			}
 		}
 	}

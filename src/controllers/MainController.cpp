@@ -3,12 +3,14 @@
 #include <utils/import/ColladaFormatImporter.h>
 #include <utils/MathUtils.h>
 
-#include <ranges>
+#include <thread>
 
 MainController::MainController(QObject *parent)
     : QObject(parent)
 {
 }
+
+MainController::~MainController() = default;
 
 MeshListModel *MainController::meshListModel() const
 {
@@ -18,12 +20,6 @@ MeshListModel *MainController::meshListModel() const
 QVector3D MainController::globalScale() const
 {
 	return m_globalScale;
-}
-
-void MainController::unloadMeshes()
-{
-	m_meshListModel.reset();
-	emit meshListModelChanged();
 }
 
 void MainController::loadMeshes()
@@ -38,8 +34,15 @@ void MainController::loadMeshes()
 		m_meshes = importer.getGeometries();
 
 		m_meshListModel = std::make_unique<MeshListModel>(m_meshes);
+		emit loadComplete();
 		emit meshListModelChanged();
 	}).detach();
+}
+
+void MainController::unloadMeshes()
+{
+	m_meshListModel.reset();
+	emit meshListModelChanged();
 }
 
 void MainController::applyPolydotTransformations(QVariantList origBasises, QVariantList resBasises)
@@ -50,33 +53,36 @@ void MainController::applyPolydotTransformations(QVariantList origBasises, QVari
 
 	unloadMeshes();
 
-	MeshList tMeshes;
-
-	//	for (const auto &mesh : m_meshes) {
-	//		Mesh tMesh;
-	//		for (const auto &line : mesh) {
-	//			auto streightLine = MathUtils::getPolydotTransformedLine(line, origBasises, resBasises);
-
-	//			auto tLine = Line::FromStreightLine(streightLine);
-
-	//			if (!tLine.isNull()) {
-	//				tMesh.emplace_back(tLine);
-	//			}
-	//		}
-	//		tMeshes.emplace_back(std::move(tMesh));
-	//	}
-
-	for (Mesh mesh : m_meshes) {
-		if (mesh.size() % 2 != 0) {
-			auto lastLine = mesh.back();
-			lastLine.p1 += {0.001, 0.001, 0};
-			// mesh.emplace_back(lastLine);
+	auto transformer = [&](Mesh mesh) {
+		switch (m_meshType) {
+		case MeshType::ClosedMesh:
+			return MathUtils::getPolydotTransformedMesh(std::move(mesh), origBasises, resBasises);
+		case MeshType::StreightLineMesh:
+			return MathUtils::getPolydotTransformedStreightLineMesh(
+			    std::move(mesh), origBasises, resBasises);
 		}
+		std::unreachable();
+	};
 
-		mesh = MathUtils::getPolydotTransformedMesh(std::move(mesh), origBasises, resBasises);
-		tMeshes.emplace_back(std::move(mesh));
-	}
+	MeshList outMeshes;
+	outMeshes.reserve(m_meshes.size());
 
-	m_meshListModel = std::make_unique<MeshListModel>(std::move(tMeshes));
+	std::ranges::transform(m_meshes, std::back_inserter(outMeshes), transformer);
+
+	m_meshListModel = std::make_unique<MeshListModel>(std::move(outMeshes));
 	emit meshListModelChanged();
+}
+
+MeshType MainController::meshType() const
+{
+	return m_meshType;
+}
+
+void MainController::setMeshType(MeshType meshType)
+{
+	if (m_meshType == meshType) {
+		return;
+	}
+	m_meshType = meshType;
+	emit meshTypeChanged();
 }

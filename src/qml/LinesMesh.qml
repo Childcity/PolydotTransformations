@@ -5,6 +5,7 @@ Node {
 	id: root
 
 	property alias model: mesh.model
+	property color color: "black"
 
 	Repeater3D {
 		id: mesh
@@ -20,7 +21,7 @@ Node {
 					DefaultMaterial {
 						lighting: DefaultMaterial.NoLighting
 						cullMode: DefaultMaterial.NoCulling
-						diffuseColor: "lightgreen"
+						diffuseColor: root.color
 						lineWidth: 3
 					}
 				]

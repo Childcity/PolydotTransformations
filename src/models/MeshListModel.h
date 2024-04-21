@@ -15,7 +15,7 @@ public:
 	};
 
 	explicit MeshListModel(MeshList meshes, QObject *parent = nullptr);
-	~MeshListModel() override = default;
+	~MeshListModel() override;
 
 	QHash<int, QByteArray> roleNames() const override;
 	int rowCount(const QModelIndex &parent) const override;

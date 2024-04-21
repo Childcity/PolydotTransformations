@@ -14,7 +14,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS
+find_package(Qt6 6.6 REQUIRED COMPONENTS
     Core
     Quick
     Quick3D
@@ -24,6 +24,8 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS
 include_directories(${SOURCE_DIR})
 include_directories(${SOURCE_DIR}/controllers)
 include_directories(${SOURCE_DIR}/models)
+include_directories(${SOURCE_DIR}/enums)
+include_directories(${SOURCE_DIR}/utils)
 
 # Find all Sources
 file(GLOB_RECURSE found_sources CONFIGURE_DEPENDS
