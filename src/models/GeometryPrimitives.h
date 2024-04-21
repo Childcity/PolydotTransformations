@@ -137,7 +137,7 @@ struct StreightLine
 
 	// clang-format off
 
-	auto toTuple() { return std::tuple{A, B, C}; }
+	auto toTuple() const { return std::tuple{A, B, C}; }
 
 	// clang-format on
 

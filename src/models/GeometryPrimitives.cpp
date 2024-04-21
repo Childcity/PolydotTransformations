@@ -316,7 +316,7 @@ QVector3D StreightLine::intersect(StreightLine other)
 	    {A2, B2, -C2},
 	});
 	assert(point.size() == 2);
-	return {static_cast<float>(point[0]), static_cast<float>(point[1]), 0};
+	return {toF(point[0]), toF(point[1]), 0};
 }
 
 LineGeometry::LineGeometry(StreightLine line)
