@@ -228,15 +228,14 @@ Mesh MathUtils::getPolydotTransformedMesh(
 			linesIntersections.emplace_back(intersectionPoint);
 		} catch (...) {
 			qCWarning(polydot_mesh)
-			    << "Feiled to fined intersection of " << leftTransformedLine
-			    << rightTransformedLine;
+			    << "Failed to find intersection of" << leftTransformedLine << rightTransformedLine;
 			// try {
 			//	rightTransformedLine *= 10;
 			//	QVector3D intersectionPoint = leftTransformedLine.intersect(rightTransformedLine);
 			//	linesIntersections.emplace_back(intersectionPoint);
 			// } catch (...) {
 			//	qCCritical(polydot_mesh)
-			//	    << "Feiled to fined intersection of " << leftTransformedLine
+			//	    << "Failed to find intersection of" << leftTransformedLine
 			//	    << rightTransformedLine;
 			// }
 		}
