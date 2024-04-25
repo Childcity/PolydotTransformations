@@ -8,7 +8,7 @@
 
 namespace {
 
-Q_LOGGING_CATEGORY(xml_importer, "xml_importer", QtInfoMsg);
+Q_LOGGING_CATEGORY(xml_importer, "utils.xml_importer", QtInfoMsg);
 
 using namespace Qt::StringLiterals;
 
@@ -55,9 +55,14 @@ std::vector<std::pair<int, int>> readLines(QXmlStreamReader &reader)
 			    << std::format("{} [count={}])", qPrintable(reader.name().toString()), count)
 			    << lineVertexStr;
 
+			int lastSecondVertex = -1;
 			for (const auto &&lineVertices :
 			     lineVertexStr.split(' ', Qt::SkipEmptyParts) | std::views::chunk(2)) {
-				result.emplace_back(lineVertices[0].toInt(), lineVertices[1].toInt());
+				const int first = lineVertices[0].toInt();
+				const int second = lineVertices[1].toInt();
+				const int firstVertexIndex = lastSecondVertex == second ? second : first;
+				lastSecondVertex = lastSecondVertex == second ? first : second;
+				result.emplace_back(firstVertexIndex, lastSecondVertex);
 			}
 		} else {
 			reader.skipCurrentElement();

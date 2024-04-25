@@ -34,6 +34,7 @@ int performOperation(Matrix &a)
 				writeLine(std::format("i: {} c: {} i+c: {}", i, c, i + c));
 			}
 			if ((i + c) == n) {
+				writeLine("Error: flag = 1");
 				flag = 1;
 				break;
 			}
@@ -127,8 +128,10 @@ Array SolveSystem(const Matrix &inA)
 	}
 
 	if (flag == 2) {
+		writeLine("InfiniteSolution");
 		throw InfiniteSolutionError("InfiniteSolution");
 	} else if (flag == 3) {
+		writeLine("NoSolutionError");
 		throw NoSolutionError("NoSolutionError");
 	}
 
