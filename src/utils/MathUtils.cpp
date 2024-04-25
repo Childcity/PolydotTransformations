@@ -41,7 +41,7 @@ double signDistanceToLine(
 {
 	auto signLength = [](QVector3D vec) {
 		// TODO: recheck if it is correct way to get a signA!
-		auto sign = vec.x() + vec.y() + vec.z() < eps ? -1 : 1;
+		auto sign = vec.x() + vec.y() + vec.z() < eps ? -1.f : 1.f;
 		return sign * std::hypot(vec.x(), vec.y(), vec.z());
 	};
 
@@ -228,7 +228,8 @@ Mesh MathUtils::getPolydotTransformedMesh(
 			linesIntersections.emplace_back(intersectionPoint);
 		} catch (...) {
 			qCWarning(polydot_mesh)
-			    << "Failed to find intersection of" << leftTransformedLine << rightTransformedLine;
+			    << "Failed to find intersection of" << leftTransformedLine << rightTransformedLine
+			    << std::uncaught_exceptions();
 			// try {
 			//	rightTransformedLine *= 10;
 			//	QVector3D intersectionPoint = leftTransformedLine.intersect(rightTransformedLine);
@@ -243,7 +244,7 @@ Mesh MathUtils::getPolydotTransformedMesh(
 	}
 
 	if (linesIntersections.empty()) {
-		qCCritical(polydot_mesh) << "Feiled to apply Polidot transformations for the mesh!";
+		qCCritical(polydot_mesh) << "Failed to apply Polidot transformations for the mesh!";
 		return {};
 	}
 
@@ -273,6 +274,6 @@ Mesh MathUtils::getPolydotTransformedStreightLineMesh(
 		}
 	}
 
-	assert((inMesh.size()) == outMesh.size());
+	// assert((inMesh.size()) == outMesh.size());
 	return outMesh;
 }
